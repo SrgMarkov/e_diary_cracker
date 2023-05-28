@@ -1,5 +1,4 @@
 import random
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from datacenter.models import Lesson, Schoolkid, Mark, Chastisement, Commendation
 
 
@@ -19,9 +18,9 @@ def fix_marks(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
         Mark.objects.filter(schoolkid=child, points__lt=4).update(points=5)
-    except MultipleObjectsReturned as error:
+    except Schoolkid.MultipleObjectsReturned as error:
         print(f'Ошибка при выполнении: {error}')
-    except ObjectDoesNotExist as error:
+    except Schoolkid.ObjectDoesNotExist as error:
         print(f'Ошибка при выполнении: {error}')
 
 
@@ -30,9 +29,9 @@ def remove_chastisements(schoolkid):
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
         chastisement = Chastisement.objects.filter(schoolkid=child)
         chastisement.delete()
-    except MultipleObjectsReturned as error:
+    except Schoolkid.MultipleObjectsReturned as error:
         print(f'Ошибка при выполнении: {error}')
-    except ObjectDoesNotExist as error:
+    except Schoolkid.ObjectDoesNotExist as error:
         print(f'Ошибка при выполнении: {error}')
 
 
@@ -45,7 +44,7 @@ def create_commendation(schoolkid, lesson, year=6, group='А'):
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
         Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date, schoolkid=child,
                                     subject=praised_lesson.subject, teacher=praised_lesson.teacher)
-    except MultipleObjectsReturned as error:
+    except Schoolkid.MultipleObjectsReturned as error:
         print(f'Ошибка при выполнении: {error}')
-    except ObjectDoesNotExist as error:
+    except Schoolkid.ObjectDoesNotExist as error:
         print(f'Ошибка при выполнении: {error}')
