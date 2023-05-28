@@ -18,10 +18,7 @@ praise_phrases = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гор
 def fix_marks(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
-        while Mark.objects.filter(schoolkid=child, points__lt=4).count() != 0:
-            marks = Mark.objects.filter(schoolkid=child, points__lt=4).first()
-            marks.points = 5
-            marks.save()
+        Mark.objects.filter(schoolkid=child, points__lt=4).update(points=5)
     except MultipleObjectsReturned as error:
         print(f'Ошибка при выполнении: {error}')
     except ObjectDoesNotExist as error:
