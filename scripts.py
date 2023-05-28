@@ -14,25 +14,27 @@ praise_phrases = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гор
                   'Теперь у тебя точно все получится!']
 
 
+def get_child(schoolkid):
+    return Schoolkid.objects.get(full_name__contains=schoolkid)
+
+
+def get_error_description(error):
+    print(f'Ошибка при выполнении: {error}')
+
+
 def fix_marks(schoolkid):
     try:
-        child = Schoolkid.objects.get(full_name__contains=schoolkid)
-        Mark.objects.filter(schoolkid=child, points__lt=4).update(points=5)
-    except Schoolkid.MultipleObjectsReturned as error:
-        print(f'Ошибка при выполнении: {error}')
-    except Schoolkid.ObjectDoesNotExist as error:
-        print(f'Ошибка при выполнении: {error}')
+        Mark.objects.filter(schoolkid=get_child(schoolkid), points__lt=4).update(points=5)
+    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
+        get_error_description(error)
 
 
 def remove_chastisements(schoolkid):
     try:
-        child = Schoolkid.objects.get(full_name__contains=schoolkid)
-        chastisement = Chastisement.objects.filter(schoolkid=child)
+        chastisement = Chastisement.objects.filter(schoolkid=get_child(schoolkid))
         chastisement.delete()
-    except Schoolkid.MultipleObjectsReturned as error:
-        print(f'Ошибка при выполнении: {error}')
-    except Schoolkid.ObjectDoesNotExist as error:
-        print(f'Ошибка при выполнении: {error}')
+    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
+        get_error_description(error)
 
 
 def create_commendation(schoolkid, lesson, year=6, group='А'):
@@ -41,10 +43,8 @@ def create_commendation(schoolkid, lesson, year=6, group='А'):
     if praised_lesson is None:
         return print('Название урока введено с ошибкой')
     try:
-        child = Schoolkid.objects.get(full_name__contains=schoolkid)
-        Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date, schoolkid=child,
-                                    subject=praised_lesson.subject, teacher=praised_lesson.teacher)
-    except Schoolkid.MultipleObjectsReturned as error:
-        print(f'Ошибка при выполнении: {error}')
-    except Schoolkid.ObjectDoesNotExist as error:
-        print(f'Ошибка при выполнении: {error}')
+        Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date,
+                                    schoolkid=get_child(schoolkid), subject=praised_lesson.subject,
+                                    teacher=praised_lesson.teacher)
+    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
+        get_error_description(error)
