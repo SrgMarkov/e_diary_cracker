@@ -15,26 +15,18 @@ praise_phrases = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гор
 
 
 def get_child(schoolkid):
-    return Schoolkid.objects.get(full_name__contains=schoolkid)
-
-
-def get_error_description(error):
-    print(f'Ошибка при выполнении: {error}')
+    try:
+        return Schoolkid.objects.get(full_name__contains=schoolkid)
+    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
+        print(f'Ошибка при выполнении: {error}')
 
 
 def fix_marks(schoolkid):
-    try:
-        Mark.objects.filter(schoolkid=get_child(schoolkid), points__lt=4).update(points=5)
-    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
-        get_error_description(error)
+    Mark.objects.filter(schoolkid=get_child(schoolkid), points__lt=4).update(points=5)
 
 
 def remove_chastisements(schoolkid):
-    try:
-        chastisement = Chastisement.objects.filter(schoolkid=get_child(schoolkid))
-        chastisement.delete()
-    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
-        get_error_description(error)
+    chastisement = Chastisement.objects.filter(schoolkid=get_child(schoolkid)).delete()
 
 
 def create_commendation(schoolkid, lesson, year=6, group='А'):
@@ -42,9 +34,7 @@ def create_commendation(schoolkid, lesson, year=6, group='А'):
         .order_by('-date').first()
     if praised_lesson is None:
         return print('Название урока введено с ошибкой')
-    try:
-        Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date,
-                                    schoolkid=get_child(schoolkid), subject=praised_lesson.subject,
-                                    teacher=praised_lesson.teacher)
-    except (Schoolkid.MultipleObjectsReturned, Schoolkid.DoesNotExist) as error:
-        get_error_description(error)
+    Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date,
+                                schoolkid=get_child(schoolkid), subject=praised_lesson.subject,
+                                teacher=praised_lesson.teacher)
+
