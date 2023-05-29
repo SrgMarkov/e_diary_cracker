@@ -2,7 +2,7 @@ import random
 from datacenter.models import Lesson, Schoolkid, Mark, Chastisement, Commendation
 
 
-praise_phrases = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!',
+PRAISE_PHRASES = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!',
                   'Ты меня приятно удивил!', 'Великолепно!', 'Прекрасно!', 'Ты меня очень обрадовал!',
                   'Именно этого я давно ждал от тебя!', 'Сказано здорово – просто и ясно!',
                   'Ты, как всегда, точен!', 'Очень хороший ответ!', 'Талантливо!',
@@ -26,7 +26,7 @@ def fix_marks(schoolkid):
 
 
 def remove_chastisements(schoolkid):
-    chastisement = Chastisement.objects.filter(schoolkid=get_child(schoolkid)).delete()
+    Chastisement.objects.filter(schoolkid=get_child(schoolkid)).delete()
 
 
 def create_commendation(schoolkid, lesson, year=6, group='А'):
@@ -34,7 +34,7 @@ def create_commendation(schoolkid, lesson, year=6, group='А'):
         .order_by('-date').first()
     if praised_lesson is None:
         return print('Название урока введено с ошибкой')
-    Commendation.objects.create(text=random.choice(praise_phrases), created=praised_lesson.date,
+    Commendation.objects.create(text=random.choice(PRAISE_PHRASES), created=praised_lesson.date,
                                 schoolkid=get_child(schoolkid), subject=praised_lesson.subject,
                                 teacher=praised_lesson.teacher)
 
